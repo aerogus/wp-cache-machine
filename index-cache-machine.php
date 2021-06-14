@@ -12,10 +12,16 @@ ini_set('default_charset', 'UTF-8');
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-ini_set('error_log', dirname(__FILE__) . '/../log/debug.log');
+ini_set('error_log', dirname(__FILE__) . '/wp-content/debug.log');
 
 define('WP_CACHE_MACHINE_DEBUG', false);
 define('WP_USE_THEMES', true);
+
+// = thème actif, à adapter
+define('WP_CACHE_MACHINE_THEME', 'twentytwentyone');
+
+// = WPCacheMachine\getBasePath()
+define('WP_CACHE_MACHINE_BASEPATH', dirname(__FILE__) . '/cache');
 
 /**
  * Écriture dans la log
@@ -36,12 +42,6 @@ function write_log($type, $message)
             break;
     }
 }
-
-// = thème actif, à adapter
-define('WP_CACHE_MACHINE_THEME', 'rock');
-
-// = Aerogus\CacheMachine\getBasePath()
-define('WP_CACHE_MACHINE_BASEPATH', dirname(__FILE__) . '/cache');
 
 // on ne met en cache que sous certaines conditions
 if (($_SERVER['REQUEST_METHOD'] === 'GET') // uniquement requête GET
@@ -126,5 +126,18 @@ if (($_SERVER['REQUEST_METHOD'] === 'GET') // uniquement requête GET
     }
 }
 
-require dirname(__FILE__) . '/wp/wp-blog-header.php';
-exit;
+// Composer met WordPress dans le sous répertoire "wp"
+if (file_exists(dirname(__FILE__) . '/wp/wp-blog-header.php')) {
+    require dirname(__FILE__) . '/wp/wp-blog-header.php';
+    exit;
+}
+// mais nativement WordPress est le répertoire courant
+elseif (file_exists(dirname(__FILE__) . '/wp-blog-header.php')) {
+    require dirname(__FILE__) . '/wp-blog-header.php';
+    exit;
+}
+// pas normal !
+else {
+    write_log('error', 'WordPress not found !');
+    exit;
+}

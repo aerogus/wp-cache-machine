@@ -67,9 +67,13 @@ function admin_page()
 <h2>WP Cache Machine</h2>
 <a href="?page=cache-machine&amp;clear-all=1">Vider tout le cache</a>
 <?php if ($cleared) : echo '<p>cache vidé</p>'; endif; ?>
-<h3>Liste des fichiers en cache</h3>
+
 <h3>Règles à mettre dans le .htaccess</h3>
 <pre style="background: #c0c0c0; padding: 10px;"><?php echo htmlentities(getHtaccessRules()); ?></pre>
+
+<h3>Modification à apporter dans le index-cache-machine.php</h3>
+<pre style="background: #c0c0c0; padding: 10px;"><?php echo htmlentities(getIndexRules()); ?></pre>
+
 <?php
 }
 
@@ -122,7 +126,7 @@ function uninstall()
  */
 function getBasePath()
 {
-    return ABSPATH . '/../cache';
+    return ABSPATH . '/cache';
 }
 
 /**
@@ -200,6 +204,15 @@ RewriteCond %{DOCUMENT_ROOT}/cache/" . getCurrentTheme() . "/%{REQUEST_URI}index
 RewriteRule ^(.*) \"/cache/" . getCurrentTheme() . "/%{REQUEST_URI}index.html\" [L]
 </IfModule>
 ### END WP Cache Machine ###";
+}
+
+/**
+ * Retourne les données à modifier dans le fichier d'index-cache-machine de la racine pour que le système de cache fonctionne
+ */
+function getIndexRules()
+{
+    return "// = thème actif, à adapter
+define('WP_CACHE_MACHINE_THEME', '" . getCurrentTheme() . "');";
 }
 
 /**

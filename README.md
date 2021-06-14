@@ -24,18 +24,30 @@ Cette librairie ne fait qu'invalider les fichiers en cache
 l'écriture proprement dite du cache se fait dans index-cache-machine.php
 (qui doit remplacer le index.php de la racine WordPress)
 
+## Prérequis
+
+- Apache 2
+- WordPress >= 4.0
+- PHP >= 7
+- module php_curl
+- accès ssh au serveur d'hébergement
+
 ## Installation
 
-- Créer le répertoire de stockage `ABSPATH . '/cache'` avec droits d'écriture pour le serveur web
+- Aller dans le `ABSPATH` (chemin de base de WordPress), ex `cd /var/www/wordpress`
+- Créer le répertoire de stockage `ABSPATH . '/cache'` avec les droits d'écriture pour le serveur web (ex `www-data`), `mkdir cache`
+- Créer un fichier de log debug. `touch wp-content/debug.log`
+- Faire une copie de sauvegarde du point d'entrée WordPress `ABSPATH . '/index.php'`, ex `cp index.php index-orig.php`
+- Copier index-cache-machine.php vers `ABSPATH . '/index.php'`, ex `cp ./wp-content/plugins/wp-cache-machine/index-cache-machine.php ./index-cache-machine.php`
+- Définir la constante `WP_CACHE_MACHINE_THEME` dans `index-cache-machine.php` avec le nom de votre thème actif, ex `twentytwentyone`
 - Activer le plugin via l'admin web ou via `wp-cli` si installé
-- Faire une sauvegarde de `ABSPATH . '/index.php'`, ex `cp index.php index.orig.php`
-- Définir la constante `WP_CACHE_MACHINE_THEME` du `index-cache-machine.php` avec le nom du thème actif, ex `twentyeleven`
-- Copier index-cache-machine.php vers `ABSPATH . '/index.php'`, ex `cp ./wp-content/plugins/wp-cache-machine/index-cache-machine.php ./index.php`
-- Intégrer les règles personnalisées proposées par le plugin dans `ABSPATH . '/.htaccess'` ou dans le fichier du virtual host
+- Intégrer les règles personnalisées proposées dans l'admin par le plugin (onglet Tools / Cache Machine / Règles à mettre dans le .htaccess) dans votre `ABSPATH . '/.htaccess'` ou dans le fichier du virtual host (entre ### BEGIN WP Cache Machine ### et ### END WP Cache Machine ###)
+- Activer le nouveau point d'entrée: `rm index.php && ln -s index-cache-machine.php index.php`
 
 ## Désinstallation
 
-- Restaurer votre sauvegarde de `ABSPATH . '/index.php'`, ex `mv index.orig.php index.php`
+- Désactiver le point d'entrée cache machine et restaurer celui d'origine : `unlink index.php && mv index-orig.php index.php`
 - Désactiver le plugin (vide le cache) via l'admin web ou via `wp-cli` si installé
 - Supprimer le répertoire de stockage `ABSPATH . '/cache'`
-- Retirer les règles personnalisées de `ABSPATH . '/.htaccess'` ou du fichier du virtual host
+- Retirer les règles personnalisées de `ABSPATH . '/.htaccess'` ou du fichier du virtual host (entre ### BEGIN WP Cache Machine ### et ### END WP Cache Machine ###)
+
